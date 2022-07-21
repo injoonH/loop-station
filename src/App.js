@@ -1,23 +1,43 @@
-import Sketch from 'react-p5';
-import 'p5/lib/addons/p5.sound';
-import './App.css';
+import Sketch from "react-p5";
+import "p5/lib/addons/p5.sound";
+import "./App.css";
 
 const App = () => {
-    const preload = (p5) => {};
+	let pixelRatio;
+	var stageWidth;
+	var stageHeight;
 
-    const setup = (p5, parentRef) => {
-        p5.createCanvas(400, 400).parent(parentRef);
-    };
+	const preload = (p5) => {};
 
-    const draw = (p5) => {
-        p5.background(50);
-    };
+	const setup = (p5, parentRef) => {
+		p5.createCanvas(window.innerWidth, window.innerHeight).parent(
+			parentRef
+		);
+		pixelRatio = p5.pixelDensity();
+		windowResized(p5);
+	};
 
-    return (
-        <div>
-            <Sketch preload={preload} setup={setup} draw={draw} />
-        </div>
-    );
+	const windowResized = (p5) => {
+		stageWidth = window.innerWidth * pixelRatio;
+		stageHeight = window.innerHeight * pixelRatio;
+		p5.resizeCanvas(stageWidth, stageHeight);
+		p5.scale(pixelRatio, pixelRatio);
+	};
+
+	const draw = (p5) => {
+		p5.background(0);
+	};
+
+	return (
+		<div>
+			<Sketch
+				preload={preload}
+				setup={setup}
+				draw={draw}
+				windowResized={windowResized}
+			/>
+		</div>
+	);
 };
 
 export default App;
