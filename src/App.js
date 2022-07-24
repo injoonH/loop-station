@@ -1,43 +1,24 @@
-import Sketch from "react-p5";
-import "p5/lib/addons/p5.sound";
-import "./App.css";
+import './App.css';
+import AudioEntry from './components/AudioEntry';
+import { AudioPlayerProvider } from 'react-use-audio-player';
+import AudioRecorder from './components/AudioRecorder';
 
 const App = () => {
-	let pixelRatio;
-	var stageWidth;
-	var stageHeight;
-
-	const preload = (p5) => {};
-
-	const setup = (p5, parentRef) => {
-		p5.createCanvas(window.innerWidth, window.innerHeight).parent(
-			parentRef
-		);
-		pixelRatio = p5.pixelDensity();
-		windowResized(p5);
-	};
-
-	const windowResized = (p5) => {
-		stageWidth = window.innerWidth * pixelRatio;
-		stageHeight = window.innerHeight * pixelRatio;
-		p5.resizeCanvas(stageWidth, stageHeight);
-		p5.scale(pixelRatio, pixelRatio);
-	};
-
-	const draw = (p5) => {
-		p5.background(0);
-	};
-
-	return (
-		<div>
-			<Sketch
-				preload={preload}
-				setup={setup}
-				draw={draw}
-				windowResized={windowResized}
-			/>
-		</div>
-	);
+    const urls = [
+        'http://codeskulptor-demos.commondatastorage.googleapis.com/GalaxyInvaders/theme_01.mp3',
+        'http://commondatastorage.googleapis.com/codeskulptor-assets/jump.ogg',
+        'http://commondatastorage.googleapis.com/codeskulptor-demos/riceracer_assets/music/start.ogg',
+    ];
+    return (
+        <div>
+            <AudioRecorder />
+            {urls.map((url) => (
+                <AudioPlayerProvider key={url}>
+                    <AudioEntry audioFile={url} />
+                </AudioPlayerProvider>
+            ))}
+        </div>
+    );
 };
 
 export default App;
