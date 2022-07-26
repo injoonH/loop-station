@@ -36,6 +36,22 @@ export default function SignUp() {
       email: data.get('email'),
       password: data.get('password'),
     });
+
+    // const signup_data = { email: data.get('email'), password: data.get('password') };
+
+    // fetch('/users/', {
+    // method: 'POST',
+    // body: JSON.stringify(signup_data),
+    // })
+    // .then((response) => response.json())
+    // .then((signup_data) => {
+    // console.log('성공:', signup_data);
+    // })
+    // .catch((error) => {
+    // console.error('실패:', error);
+    // });
+
+
   };
 
   return (
