@@ -1,22 +1,26 @@
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+
+import SignIn from './components/SignIn/SignIn';
+import SignUp from './components/SignUp/SignUp';
+import Record from './components/Record';
+import Store from './components/Store';
+import ResponsiveAppBar from './components/ResponsiveAppBar';
+
 import './App.css';
-import AudioEntry from './components/AudioEntry';
-import { AudioPlayerProvider } from 'react-use-audio-player';
-import AudioRecorder from './components/AudioRecorder';
 
 const App = () => {
-    const urls = [
-        'http://codeskulptor-demos.commondatastorage.googleapis.com/GalaxyInvaders/theme_01.mp3',
-        'http://commondatastorage.googleapis.com/codeskulptor-assets/jump.ogg',
-        'http://commondatastorage.googleapis.com/codeskulptor-demos/riceracer_assets/music/start.ogg',
-    ];
     return (
         <div>
-            <AudioRecorder />
-            {urls.map((url) => (
-                <AudioPlayerProvider key={url}>
-                    <AudioEntry audioFile={url} />
-                </AudioPlayerProvider>
-            ))}
+            <BrowserRouter>
+                <ResponsiveAppBar/>
+                <Routes>
+                    {/* <Route path="/" element={<Record />}/> */}
+                    <Route path="/record" element={<Record />}/>
+                    <Route path="/store" element={<Store />}/>
+                    <Route path="/signin" element={<SignIn />}/>
+                    <Route path="/signup" element={<SignUp />}/>
+                </Routes>
+            </BrowserRouter>
         </div>
     );
 };
