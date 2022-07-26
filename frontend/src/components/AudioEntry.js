@@ -43,7 +43,7 @@ const AudioEntry = ({ audioFile }) => {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 		ctx.lineWidth = 2;
-		console.log(percentComplete);
+		// console.log(percentComplete);
 		ctx.beginPath();
 		ctx.moveTo((canvas.width / 100) * percentComplete, 0);
 		ctx.lineTo((canvas.width / 100) * percentComplete, canvas.height);
