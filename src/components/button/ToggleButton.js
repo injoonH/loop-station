@@ -7,7 +7,7 @@ const ToggleButton = ({
 	falseComp,
 	trueCb,
 	falseCb,
-	getStreamData,
+	saveAmpToFiles,
 }) => {
 	return (
 		<div
@@ -15,10 +15,12 @@ const ToggleButton = ({
 			onClick={() => {
 				if (state === true) {
 					trueCb();
+					saveAmpToFiles();
 				} else {
 					falseCb();
 				}
 				setState((curr) => !curr);
+				console.log(state);
 			}}
 		>
 			{state ? trueComp : falseComp}

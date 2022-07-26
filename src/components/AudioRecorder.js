@@ -4,11 +4,14 @@ import { BsFillStopFill, BsFillRecordFill } from "react-icons/bs";
 import ToggleButton from "./button/ToggleButton";
 import "./AudioRecorder.css";
 
-const AudioRecorder = () => {
-	let canvas;
-	let ctx;
+const AudioRecorder = ({ soundFiles, setSoundFiles }) => {
+	let canvas, ctx;
 	let analyser;
 	let bufferLength;
+	let ampAvg = 0;
+	let ampArray = [];
+	let stageWidth, stageHeight, pixelRatio;
+
 	const streamData = useRef();
 	const canvasRef = useRef();
 	const [isRecording, setIsRecording] = useState(false);
@@ -18,21 +21,31 @@ const AudioRecorder = () => {
 		stopRecording,
 		mediaBlobUrl,
 		previewAudioStream,
-		customMediaStream,
 	} = useReactMediaRecorder({ audio: true, askPermissionOnMount: true });
 
 	useEffect(() => {
 		canvas = canvasRef.current;
-		canvas.width = canvas.clientWidth;
-		canvas.height = canvas.clientHeight;
 		ctx = canvas.getContext("2d");
-		window.requestAnimationFrame(draw);
+
+		pixelRatio = window.devicePixelRatio > 1 ? 2 : 1;
+		resize();
+
 		getStreamData();
+
+		window.addEventListener("resize", resize, false);
+		window.requestAnimationFrame(draw);
 	});
+
+	const resize = () => {
+		stageWidth = document.body.clientWidth;
+		stageHeight = document.body.clientHeight;
+		canvas.width = stageWidth * pixelRatio;
+		canvas.height = (stageWidth / 12) * pixelRatio;
+		// ctx.scale(pixelRatio, pixelRatio);
+	};
 
 	const getStreamData = () => {
 		if (previewAudioStream === null) return;
-		console.log(previewAudioStream);
 		const audioCtx = new (window.AudioContext ||
 			window.webkitAudioContext)();
 		analyser = audioCtx.createAnalyser();
@@ -41,61 +54,85 @@ const AudioRecorder = () => {
 		source.connect(analyser);
 		bufferLength = analyser.frequencyBinCount;
 		streamData.current = new Uint8Array(bufferLength);
-		console.log(streamData.current);
 		analyser.getByteTimeDomainData(streamData.current);
-		console.log(streamData.current);
 	};
 
 	const draw = () => {
-		if (analyser) {
-			analyser.getByteTimeDomainData(streamData.current);
-		}
-		let rms = 0;
+		ctx.fillStyle = "rgb(10,10,10)";
+		ctx.strokeStyle = "rgb(255,255,255)";
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
-		ctx.lineWidth = 2;
-		ctx.fillStyle = "rgb(100,100,100)";
-		ctx.strokeStyle = "rgb(0,0,0)";
-		ctx.beginPath();
-		let sliceWidth = canvas.width / bufferLength;
-		let x = 0;
-		for (let i = 0; i < bufferLength; i++) {
-			rms += streamData.current[i] * streamData.current[i];
-			rms /= bufferLength;
-			rms = rms;
-			let v = streamData.current[i] / 128.0;
-			let y = rms + canvas.height / 2;
-
-			if (i === 0) {
-				ctx.moveTo(x, y);
-			} else {
-				ctx.lineTo(x, y);
+		if (analyser && isRecording) {
+			analyser.getByteTimeDomainData(streamData.current);
+			ctx.lineWidth = 0.5;
+			let amp = 0;
+			let move = 0;
+			for (let i = 0; i < bufferLength; i++) {
+				if (amp < streamData.current[i]) {
+					amp = streamData.current[i];
+				}
+			}
+			if (isRecording) {
+				ampAvg += amp;
+				ampArray.push(ampAvg);
+				ampAvg = 0;
 			}
 
-			x += sliceWidth;
+			for (let i = 0; i < ampArray.length; i++) {
+				ctx.beginPath();
+				ctx.moveTo(
+					canvas.width / 2 - i - move,
+					canvas.height / 2 +
+						(ampArray[ampArray.length - 1 - i] - 125) *
+							(canvas.height / (150 * 2))
+				);
+				ctx.lineTo(
+					canvas.width / 2 - i - move,
+					canvas.height / 2 -
+						(ampArray[ampArray.length - 1 - i] - 125) *
+							(canvas.height / (150 * 2))
+				);
+				ctx.stroke();
+				ctx.closePath();
+				move += 1;
+			}
 		}
+		ctx.lineWidth = 1;
+		ctx.strokeStyle = "rgb(255,0,0)";
+		ctx.beginPath();
+		ctx.moveTo(canvas.width / 2, 0);
+		ctx.lineTo(canvas.width / 2, canvas.height);
 		ctx.stroke();
 		ctx.closePath();
 		window.requestAnimationFrame(draw);
 	};
 
+	const saveAmpToFiles = () => {
+		console.log("Save");
+		setSoundFiles((cur) => [...cur, ampArray]);
+		ampArray = [];
+	};
+
 	return (
-		<div>
-			<h1>{status}</h1>
-			{/* recording start-stop button */}
-			<ToggleButton
-				state={isRecording}
-				setState={setIsRecording}
-				trueComp={<BsFillStopFill style={{ color: "#bdc3c7" }} />}
-				falseComp={<BsFillRecordFill style={{ color: "#f22b2b" }} />}
-				trueCb={stopRecording}
-				falseCb={startRecording}
-				getStreamData={getStreamData}
-			/>
-			<audio src={mediaBlobUrl} autoPlay loop>
+		<div className="audio-recorder-container">
+			<audio src={mediaBlobUrl}>
 				Your browser does not support the <code>audio</code> element.
 			</audio>
-			<canvas ref={canvasRef} width={window.innerWidth}></canvas>
+			<canvas ref={canvasRef}></canvas>
+			<div>
+				{/* recording start-stop button */}
+				<ToggleButton
+					state={isRecording}
+					setState={setIsRecording}
+					trueComp={<BsFillStopFill style={{ color: "#bdc3c7" }} />}
+					falseComp={
+						<BsFillRecordFill style={{ color: "#f22b2b" }} />
+					}
+					trueCb={stopRecording}
+					falseCb={startRecording}
+					saveAmpToFiles={saveAmpToFiles}
+				/>
+			</div>
 		</div>
 	);
 };
