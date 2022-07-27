@@ -15,6 +15,7 @@ const Record = () => {
         'http://codeskulptor-demos.commondatastorage.googleapis.com/GalaxyInvaders/theme_01.mp3',
         'http://commondatastorage.googleapis.com/codeskulptor-assets/jump.ogg',
         'http://commondatastorage.googleapis.com/codeskulptor-demos/riceracer_assets/music/start.ogg',
+        
     ];
     return (
         <div className='audio-container'>

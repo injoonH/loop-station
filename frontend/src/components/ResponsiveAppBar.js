@@ -143,6 +143,16 @@ const ResponsiveAppBar = () => {
                     ))}
                 </Box>
 
+                <Box>
+                    <a
+                    style={{textDecoration: 'none'}}
+                    href='/signin'>
+                        <Button
+                        color="inherit"
+                        sx={{my: 2, color: 'white', display: 'block' , fontSize: 'small'}}>Login</Button>
+                    </a>
+                </Box>
+{/* 
                 <Box sx={{ flexGrow: 0 }}>
                     <Tooltip title="Open settings">
                     <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -171,7 +181,7 @@ const ResponsiveAppBar = () => {
                         </MenuItem>
                     ))}
                     </Menu>
-                </Box>
+                </Box> */}
             </Toolbar>
         </Container>
     </AppBar>

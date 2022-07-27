@@ -21,7 +21,47 @@ const AudioRecorder = ({ soundFiles, setSoundFiles }) => {
 		stopRecording,
 		mediaBlobUrl,
 		previewAudioStream,
-	} = useReactMediaRecorder({ audio: true, askPermissionOnMount: true });
+	} = useReactMediaRecorder({ audio: true, askPermissionOnMount: true, onStop: (blobUrl, blob) => {
+        // blob.getBytes(1, blob.size);
+        // blob.arrayBuffer()
+        // .then(() => {
+
+        // })
+        // .catch(() => {
+
+        // });
+        var arrayPromise = new Promise(function(resolve) {
+            var reader = new FileReader();
+
+            reader.onloadend = function() {
+                resolve(reader.result);
+            };
+
+            reader.readAsArrayBuffer(blob);
+        });
+        arrayPromise.then(async function(array) {
+            console.log("Array contains", array.byteLength, "bytes.");
+            console.log(array);
+
+            
+            const stringData = new TextDecoder().decode(array);
+            console.log(stringData);
+
+            const headers = new Headers();
+            headers.append("Content-Type", "multipart/form-data");
+
+            // const res = await fetch(`http://192.249.18.122/users/1/audio?audio=${stringData}`, {
+            const res = await fetch(`http://192.249.18.122/users/1/audio`, {
+                method: 'POST',
+                // headers: headers,
+                body: JSON.stringify({
+                    audio: Array.from(new Uint8Array(array))
+                })
+            });
+            console.log('res', res);
+        });
+
+    } });
 
 	useEffect(() => {
 		canvas = canvasRef.current;
@@ -110,14 +150,18 @@ const AudioRecorder = ({ soundFiles, setSoundFiles }) => {
 	const saveAmpToFiles = () => {
 		console.log("Save");
 		setSoundFiles((cur) => [...cur, ampArray]);
+        // console.log(soundFiles);
+        // console.log(mediaBlobUrl);
+
 		ampArray = [];
 	};
 
 	return (
 		<div className="audio-recorder-container">
-			<audio src={mediaBlobUrl}>
+            
+			{/* <audio autoPlay controls loop src={mediaBlobUrl}>
 				Your browser does not support the <code>audio</code> element.
-			</audio>
+			</audio> */}
 			<canvas ref={canvasRef}></canvas>
 			<div>
 				{/* recording start-stop button */}
