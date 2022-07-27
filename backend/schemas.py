@@ -1,9 +1,18 @@
-from fastapi import File
 from pydantic import BaseModel
 
 
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: str
+
+
 class AudioBase(BaseModel):
-    name: str
+    # name: str
+    pass
 
 
 class AudioCreate(AudioBase):
@@ -19,6 +28,7 @@ class Audio(AudioBase):
 
 
 class UserBase(BaseModel):
+    name: str
     email: str
 
 

@@ -1,16 +1,18 @@
-import os
-import bcrypt
-from dotenv import load_dotenv
 from sqlalchemy.orm import Session
+from passlib.context import CryptContext
+
 import models
 import schemas
 
-load_dotenv()
-salt_rounds = int(os.environ.get('SALT_ROUNDS'))
+pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 
 def get_user(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.id == user_id).first()
+
+
+def get_user_by_name(db: Session, name: str):
+    return db.query(models.User).filter(models.User.name == name).first()
 
 
 def get_user_by_email(db: Session, email: str):
@@ -18,10 +20,9 @@ def get_user_by_email(db: Session, email: str):
 
 
 def create_user(db: Session, user: schemas.UserCreate):
-    salt = bcrypt.gensalt(rounds=salt_rounds)
-    hashed_password = bcrypt.hashpw(user.password.encode('utf-8'), salt)
+    hashed_password = pwd_context.hash(user.password.encode('utf-8'))
 
-    db_user = models.User(email=user.email, hashed_password=hashed_password)
+    db_user = models.User(name=user.name, email=user.email, hashed_password=hashed_password)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -29,8 +30,7 @@ def create_user(db: Session, user: schemas.UserCreate):
 
 
 def create_user_audio(db: Session, audio: schemas.AudioCreate, user_id: int):
-    # TODO: save audio file using audio.audio_file
-    db_audio = models.Audio(name=audio.name, owner_id=user_id)
+    db_audio = models.Audio(owner_id=user_id)
     db.add(db_audio)
     db.commit()
     db.refresh(db_audio)
