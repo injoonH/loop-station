@@ -27,6 +27,7 @@ const AudioEntry = ({ audioFile }) => {
 		src: audioFile,
 		autoplay: false,
 		loop: true,
+        format: ["wav"],
 	});
 	const { percentComplete } = useAudioPosition({
 		highRefreshRate: true,

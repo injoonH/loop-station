@@ -1,6 +1,9 @@
+import React from 'react';
 import { useRef, useState, useEffect } from "react";
 import { useReactMediaRecorder } from "react-media-recorder";
 import { BsFillStopFill, BsFillRecordFill } from "react-icons/bs";
+import audioContext, { AudioProvider } from './AudioProvider';
+
 import ToggleButton from "./button/ToggleButton";
 import "./AudioRecorder.css";
 
@@ -11,6 +14,9 @@ const AudioRecorder = ({ soundFiles, setSoundFiles }) => {
 	let ampAvg = 0;
 	let ampArray = [];
 	let stageWidth, stageHeight, pixelRatio;
+
+
+    const [urls, setUrls] = React.useContext(audioContext)
 
 	const streamData = useRef();
 	const canvasRef = useRef();
@@ -30,6 +36,10 @@ const AudioRecorder = ({ soundFiles, setSoundFiles }) => {
         // .catch(() => {
 
         // });
+        console.log(blob.type);
+        setUrls((cur) => [...cur, blobUrl]);
+
+
         var arrayPromise = new Promise(function(resolve) {
             var reader = new FileReader();
 
@@ -40,12 +50,12 @@ const AudioRecorder = ({ soundFiles, setSoundFiles }) => {
             reader.readAsArrayBuffer(blob);
         });
         arrayPromise.then(async function(array) {
-            console.log("Array contains", array.byteLength, "bytes.");
-            console.log(array);
+            // console.log("Array contains", array.byteLength, "bytes.");
+            // console.log(array);
 
             
             const stringData = new TextDecoder().decode(array);
-            console.log(stringData);
+            // console.log(stringData);
 
             const headers = new Headers();
             headers.append("Content-Type", "multipart/form-data");
@@ -58,7 +68,7 @@ const AudioRecorder = ({ soundFiles, setSoundFiles }) => {
                     audio: Array.from(new Uint8Array(array))
                 })
             });
-            console.log('res', res);
+            // console.log('res', res);
         });
 
     } });
